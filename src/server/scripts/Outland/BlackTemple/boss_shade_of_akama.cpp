@@ -110,6 +110,7 @@ static Location BrokenWP[]=
 #define CREATURE_BROKEN             23319
 
 const uint32 spawnEntries[4]= { 23523, 23318, 23524 };
+uint32 DeathCount;
 
 class mob_ashtongue_channeler : public CreatureScript
 {
@@ -131,7 +132,9 @@ public:
         uint64 ShadeGUID;
 
         void Reset() {}
-        void JustDied(Unit* /*killer*/);
+		void JustDied(Unit* /*killer*/){
+		 DeathCount++;
+		}
         void EnterCombat(Unit* /*who*/) {}
         void AttackStart(Unit* /*who*/) {}
         void MoveInLineOfSight(Unit* /*who*/) {}
@@ -167,7 +170,9 @@ public:
             CheckTimer = 5000;
         }
 
-        void JustDied(Unit* /*killer*/);
+		void JustDied(Unit* /*killer*/){
+		DeathCount ++;
+		}
         void EnterCombat(Unit* /*who*/) {}
         void AttackStart(Unit* /*who*/) {}
         void MoveInLineOfSight(Unit* /*who*/) {}
@@ -226,7 +231,7 @@ public:
         uint64 AkamaGUID;
 
         uint32 SorcererCount;
-        uint32 DeathCount;
+        
 
         uint32 ReduceHealthTimer;
         uint32 SummonTimer;
@@ -529,7 +534,8 @@ public:
 
 };
 
-void mob_ashtongue_channeler::mob_ashtongue_channelerAI::JustDied(Unit* /*killer*/)
+/*
+void mob_ashtongue_channeler::mob_ashtongue_channelerAI::JustDied()
 {
     Creature* Shade = (Unit::GetCreature((*me), ShadeGUID));
     if (Shade && Shade->isAlive())
@@ -537,13 +543,14 @@ void mob_ashtongue_channeler::mob_ashtongue_channelerAI::JustDied(Unit* /*killer
     else sLog->outError(LOG_FILTER_TSCR, "SD2 ERROR: Channeler dead but unable to increment DeathCount for Shade of Akama.");
 }
 
-void mob_ashtongue_sorcerer::mob_ashtongue_sorcererAI::JustDied(Unit* /*killer*/)
+void mob_ashtongue_sorcerer::mob_ashtongue_sorcererAI::JustDied()
 {
     Creature* Shade = (Unit::GetCreature((*me), ShadeGUID));
     if (Shade && Shade->isAlive())
         CAST_AI(boss_shade_of_akama::boss_shade_of_akamaAI, Shade->AI())->IncrementDeathCount(me->GetGUID());
     else sLog->outError(LOG_FILTER_TSCR, "SD2 ERROR: Sorcerer dead but unable to increment DeathCount for Shade of Akama.");
 }
+*/
 
 class npc_akama_shade : public CreatureScript
 {
