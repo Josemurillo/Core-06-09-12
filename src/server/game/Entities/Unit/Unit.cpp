@@ -5538,7 +5538,8 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!player)
                         return false;
                     // not checking Infusion auras because its in targetAuraSpell of credit spell
-                    if (player->GetQuestStatus(24749) == QUEST_STATUS_INCOMPLETE)       // Unholy Infusion
+                    if(player->GetRaidDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL || player->GetRaidDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC){
+					if (player->GetQuestStatus(24749) == QUEST_STATUS_INCOMPLETE)       // Unholy Infusion
                     {
                         if (GetEntry() != 36678)                                        // Professor Putricide
                             return false;
@@ -5559,6 +5560,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         CastSpell(target, 72289, true);                                 // Quest Credit
                         return true;
                     }
+					}
                     else if (player->GetQuestStatus(24547) == QUEST_STATUS_INCOMPLETE)  // A Feast of Souls
                         triggered_spell_id = 71203;
                     break;
