@@ -559,6 +559,7 @@ class boss_the_lich_king : public CreatureScript
             {
                 _JustReachedHome();
                 instance->SetBossState(DATA_THE_LICH_KING, NOT_STARTED);
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
                 // Reset The Frozen Throne gameobjects
                 FrozenThroneResetWorker reset;
@@ -670,6 +671,7 @@ class boss_the_lich_king : public CreatureScript
             {
                 if (events.GetPhaseMask() & PHASE_MASK_ONE && !HealthAbovePct(70))
                 {
+					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     events.SetPhase(PHASE_TRANSITION);
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
@@ -679,6 +681,7 @@ class boss_the_lich_king : public CreatureScript
 
                 if (events.GetPhaseMask() & PHASE_MASK_TWO && !HealthAbovePct(40))
                 {
+					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     events.SetPhase(PHASE_TRANSITION);
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
@@ -985,14 +988,16 @@ class boss_the_lich_king : public CreatureScript
                         case EVENT_QUAKE:
                             events.SetPhase(PHASE_TWO);
                             me->ClearUnitState(UNIT_STATE_CASTING);  // clear state to ensure check in DoCastAOE passes
-                            DoCastAOE(SPELL_QUAKE);
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+							DoCastAOE(SPELL_QUAKE);
                             SendMusicToPlayers(MUSIC_SPECIAL);
                             Talk(SAY_LK_QUAKE);
                             break;
                         case EVENT_QUAKE_2:
                             events.SetPhase(PHASE_THREE);
                             me->ClearUnitState(UNIT_STATE_CASTING);  // clear state to ensure check in DoCastAOE passes
-                            DoCastAOE(SPELL_QUAKE);
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+							DoCastAOE(SPELL_QUAKE);
                             SendMusicToPlayers(MUSIC_SPECIAL);
                             Talk(SAY_LK_QUAKE);
                             break;
