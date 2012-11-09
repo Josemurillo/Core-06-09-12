@@ -31,14 +31,13 @@ OutdoorPvPNA::OutdoorPvPNA()
 
 void OutdoorPvPNA::HandleKillImpl(Player* player, Unit* killed)
 {
-    if (killed->GetTypeId() == TYPEID_PLAYER && player->GetTeam() != killed->ToPlayer()->GetTeam())
-    {
-        player->KilledMonsterCredit(NA_CREDIT_MARKER, 0); // 0 guid, btw it isn't even used in killedmonster function :S
-        if (player->GetTeam() == ALLIANCE)
-            player->CastSpell(player, NA_KILL_TOKEN_ALLIANCE, true);
-        else
-            player->CastSpell(player, NA_KILL_TOKEN_HORDE, true);
-    }
+    if (killed->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    if (player->GetTeam() == ALLIANCE && killed->ToPlayer()->GetTeam() != ALLIANCE)
+        player->CastSpell(player, NA_KILL_TOKEN_ALLIANCE, true);
+    else if (player->GetTeam() == HORDE && killed->ToPlayer()->GetTeam() != HORDE)
+        player->CastSpell(player, NA_KILL_TOKEN_HORDE, true);
 }
 
 uint32 OPvPCapturePointNA::GetAliveGuardsCount()
