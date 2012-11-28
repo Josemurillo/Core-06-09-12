@@ -1483,7 +1483,7 @@ class npc_valkyr_shadowguard : public CreatureScript
                 _events.Reset();
                 me->SetReactState(REACT_PASSIVE);
                 DoCast(me, SPELL_WINGS_OF_THE_DAMNED, false);
-                me->SetSpeed(MOVE_FLIGHT, 0.642857f, true);
+                me->SetSpeed(MOVE_FLIGHT, 0.3f, true);
             }
 
             void IsSummonedBy(Unit* /*summoner*/)
