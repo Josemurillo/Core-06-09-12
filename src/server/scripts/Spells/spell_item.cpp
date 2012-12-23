@@ -168,6 +168,9 @@ class spell_item_flask_of_the_north : public SpellScriptLoader
                         possibleSpells.push_back(SPELL_FLASK_OF_THE_NORTH_AP);
                         break;
                     case CLASS_DRUID:
+						possibleSpells.push_back(SPELL_FLASK_OF_THE_NORTH_SP);
+                        possibleSpells.push_back(SPELL_FLASK_OF_THE_NORTH_AP);
+                        break;
                     case CLASS_PALADIN:
                         possibleSpells.push_back(SPELL_FLASK_OF_THE_NORTH_SP);
                         possibleSpells.push_back(SPELL_FLASK_OF_THE_NORTH_STR);
