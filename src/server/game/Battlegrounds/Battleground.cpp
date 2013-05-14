@@ -730,6 +730,7 @@ void Battleground::EndBattleground(uint32 winner)
     int32  winner_matchmaker_change = 0;
     WorldPacket data;
     int32 winmsg_id = 0;
+	uint32 arenafarmcheck = 0;
 
     if (winner == ALLIANCE)
     {
@@ -761,7 +762,13 @@ void Battleground::EndBattleground(uint32 winner)
     {
         winner_arena_team = sArenaTeamMgr->GetArenaTeamById(GetArenaTeamIdForTeam(winner));
         loser_arena_team = sArenaTeamMgr->GetArenaTeamById(GetArenaTeamIdForTeam(GetOtherTeam(winner)));
-        if (winner_arena_team && loser_arena_team && winner_arena_team != loser_arena_team)
+
+		CharacterDatabase.PExecute ("insert into arenas values ('%u','%u',now())", winner_arena_team->GetId(),loser_arena_team->GetId());
+		QueryResult result = CharacterDatabase.PQuery ("select count(*) from arenas where ganador='%u' and perdedor='%u' and timestamp>subdate(now(), interval 2 hour);",winner_arena_team->GetId(),loser_arena_team->GetId());
+        Field* fields = result->Fetch();
+		arenafarmcheck = fields[0].GetUInt32();
+        sLog->outError(LOG_FILTER_SQL, "arenafarmcheck: %u", arenafarmcheck);
+        if (winner_arena_team && loser_arena_team && winner_arena_team != loser_arena_team && arenafarmcheck<=3)
         {
             if (winner != WINNER_NONE)
             {
@@ -769,6 +776,7 @@ void Battleground::EndBattleground(uint32 winner)
                 loser_matchmaker_rating = GetArenaMatchmakerRating(GetOtherTeam(winner));
                 winner_team_rating = winner_arena_team->GetRating();
                 winner_matchmaker_rating = GetArenaMatchmakerRating(winner);
+				sLog->outError(LOG_FILTER_SQL, "match Type: %u", GetArenaMatchmakerRating(winner));
                 winner_matchmaker_change = winner_arena_team->WonAgainst(winner_matchmaker_rating, loser_matchmaker_rating, winner_change);
                 loser_matchmaker_change = loser_arena_team->LostAgainst(loser_matchmaker_rating, winner_matchmaker_rating, loser_change);
                 sLog->outDebug(LOG_FILTER_ARENAS, "match Type: %u --- Winner: old rating: %u, rating gain: %d, old MMR: %u, MMR gain: %d --- Loser: old rating: %u, rating loss: %d, old MMR: %u, MMR loss: %d ---", m_ArenaType, winner_team_rating, winner_change, winner_matchmaker_rating,
@@ -807,7 +815,7 @@ void Battleground::EndBattleground(uint32 winner)
         if (itr->second.OfflineRemoveTime)
         {
             //if rated arena match - make member lost!
-            if (isArena() && isRated() && winner_arena_team && loser_arena_team && winner_arena_team != loser_arena_team)
+            if (isArena() && isRated() && winner_arena_team && loser_arena_team && winner_arena_team != loser_arena_team && arenafarmcheck<=3)
             {
                 if (team == winner)
                     winner_arena_team->OfflineMemberLost(itr->first, loser_matchmaker_rating, winner_matchmaker_change);
@@ -845,7 +853,7 @@ void Battleground::EndBattleground(uint32 winner)
         //if (!team) team = player->GetTeam();
 
         // per player calculation
-        if (isArena() && isRated() && winner_arena_team && loser_arena_team && winner_arena_team != loser_arena_team)
+        if (isArena() && isRated() && winner_arena_team && loser_arena_team && winner_arena_team != loser_arena_team && arenafarmcheck<=3)
         {
             if (team == winner)
             {

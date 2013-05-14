@@ -114,7 +114,19 @@ bool ArenaTeam::AddMember(uint64 playerGuid)
         playerName = (*result)[0].GetString();
         playerClass = (*result)[1].GetUInt8();
     }
-
+	
+	 QueryResult checkeo = CharacterDatabase.PQuery("select guid from arenatime where guid='%u' and tipo='%u' and timestamp>SUBDATE(now(),INTERVAL 7 DAY)",GUID_LOPART(playerGuid),GetType()); 
+		if (checkeo)
+		{ 
+			//player->Whisper("RECUERDA QUE NO PUEDES ENTRAR EN OTRO EQUIPO HASTA QUE PASEN 7 DIAS DESDE QUE ENTRASTE EN EL ULTIMO EQUIPO", LANG_UNIVERSAL, player->GetGUID());
+			return false;
+		}
+		else
+		{
+			CharacterDatabase.PExecute("INSERT INTO arenatime values ('%u','%u','%u',now())",GUID_LOPART(playerGuid),GetId(),GetType());
+			//player->Whisper("RECUERDA QUE NO DEBES SALIRTE DEL EQUIPO YA QUE NO PODRAS ENTRAR EN OTRO HASTA HABER TRANSCURRIDO 7 DIAS", LANG_UNIVERSAL, player->GetGUID());
+		}
+			
     // Check if player is already in a similar arena team
     if ((player && player->GetArenaTeamId(GetSlot())) || Player::GetArenaTeamIdFromDB(playerGuid, GetType()) != 0)
     {
@@ -164,6 +176,7 @@ bool ArenaTeam::AddMember(uint64 playerGuid)
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_TEAM_MEMBER);
     stmt->setUInt32(0, TeamId);
     stmt->setUInt32(1, GUID_LOPART(playerGuid));
+	sLog->outError(LOG_FILTER_SQL, "personalRating", personalRating);
     CharacterDatabase.Execute(stmt);
 
     // Inform player if online
@@ -567,7 +580,7 @@ uint32 ArenaTeam::GetAverageMMR(Group* group) const
         return 0;
 
     uint32 matchMakerRating = 0;
-    uint32 playerDivider = 0;
+	//uint32 playerDivider = 0;
     for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)
     {
         // Skip if player is not online
@@ -578,18 +591,29 @@ uint32 ArenaTeam::GetAverageMMR(Group* group) const
         if (!group->IsMember(itr->Guid))
             continue;
 
-        matchMakerRating += itr->MatchMakerRating;
-        ++playerDivider;
-    }
+        if (matchMakerRating < itr->MatchMakerRating)
+        
+        {
+            matchMakerRating = itr->MatchMakerRating;
+        }
+
+      if (matchMakerRating < itr->MatchMakerRating)
+		
+		{
+			matchMakerRating = itr->MatchMakerRating;
+		}
+
+      /* matchMakerRating += itr->MatchMakerRating;
+        ++playerDivider;*/
+     }
 
     // x/0 = crash
-    if (playerDivider == 0)
-        playerDivider = 1;
-
-    matchMakerRating /= playerDivider;
+	/*   if (playerDivider == 0)
+	playerDivider = 1;
+	matchMakerRating /= playerDivider;*/
 
     return matchMakerRating;
-}
+} 
 
 float ArenaTeam::GetChanceAgainst(uint32 ownRating, uint32 opponentRating)
 {
