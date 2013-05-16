@@ -1161,6 +1161,11 @@ bool SpellInfo::IsSingleTarget() const
 
 bool SpellInfo::IsSingleTargetWith(SpellInfo const* spellInfo) const
 {
+	
+	// Vigilance and Damage Reduction spells
+    if (Id == 68066 || (Id == 50720 && spellInfo->Id == 68066))
+        return false;
+	
     // TODO - need better check
     // Equal icon and spellfamily
     if (SpellFamilyName == spellInfo->SpellFamilyName &&
