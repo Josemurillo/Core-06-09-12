@@ -143,7 +143,7 @@ public:
             uiDeathArmyCheckTimer = 1000;
             uiResurrectTimer = 4000;
             uiGhoulExplodeTimer = 8000;
-            uiDeathBiteTimer = urand (2000, 4000);
+            uiDeathBiteTimer = urand (8000, 10000);
             uiMarkedDeathTimer = urand (5000, 7000);
         }
 
@@ -296,7 +296,7 @@ public:
                     if (uiDeathBiteTimer <= diff)
                     {
                         DoCastAOE(SPELL_DEATH_BITE);
-                        uiDeathBiteTimer = urand (1000, 2000);
+                        uiDeathBiteTimer = urand (8000, 10000);
                     } else uiDeathBiteTimer -= diff;
                     if (uiMarkedDeathTimer <= diff)
                     {
