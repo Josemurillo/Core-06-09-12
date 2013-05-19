@@ -115,7 +115,7 @@ class boss_arlokk : public CreatureScript
                     instance->SetData(DATA_ARLOKK, NOT_STARTED);
 
                 //we should be summoned, so despawn
-                me->DespawnOrUnsummon();
+                //me->DespawnOrUnsummon();
             }
 
             void JustDied(Unit* /*killer*/)
