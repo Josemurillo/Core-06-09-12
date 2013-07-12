@@ -3582,6 +3582,10 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->manaCost = 0;
                 spellInfo->manaPerSecond = 0;
                 break;
+			case 24259: // Spell Lock silence
+				spellInfo->speed = 10;
+				break;
+
             default:
                 break;
         }
