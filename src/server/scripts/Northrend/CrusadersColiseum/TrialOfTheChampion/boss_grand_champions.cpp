@@ -902,13 +902,15 @@ public:
 
             if(me->HasUnitState(UNIT_STATE_CASTING))
                 return;
-
-            if(me->GetDistance(me->getVictim()) >= 30.0f)
+			if (Unit* target = me->getVictim()){
+            if(me->GetDistance(target) >= 30.0f)
                 me->GetMotionMaster()->MoveChase(me->getVictim(), 25.0f);
+			}
 
             if (disengageTimer <= diff)
             {
-                if(me->GetDistance(me->getVictim()) <= 3.0f)
+				if (Unit* target = me->getVictim())
+                if(me->GetDistance(target) <= 3.0f)
                 {
                     DoCast(SPELL_DISENGAGE);
                     disengageTimer = 7000;
@@ -944,13 +946,15 @@ public:
             // Shoot instead of meele swing
             if (me->isAttackReady())
             {
+				if(Unit * target2 = me->getVictim()){
                 if(Aura* lArrows = me->GetAura(SPELL_LIGHTNING_ARROWS))
                 {
-                    DoCast(me->getVictim(), SPELL_LIGHTNING_ARROWS_DAMAGE, true);
+                    DoCast(target2, SPELL_LIGHTNING_ARROWS_DAMAGE, true);
                     lArrows->ModCharges(-1);
                 }
-                DoCast(me->getVictim(), SPELL_SHOOT, true);
+                DoCast(target2, SPELL_SHOOT, true);
                 me->resetAttackTimer();
+				}
             }
         }
     };
