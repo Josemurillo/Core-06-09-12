@@ -24,6 +24,14 @@ void AddSC_example_gossip_codebox();
 void AddSC_example_misc();
 void AddSC_example_commandscript();
 
+//Custom
+void AddSC_zertharion();
+void AddSC_yamix();
+void AddSC_boss_sega();
+void AddSC_boss_aregos();
+void AddSC_boss_father();
+void AddSC_boss_cromatus();
+
 // spells
 void AddSC_deathknight_spell_scripts();
 void AddSC_druid_spell_scripts();
@@ -1267,6 +1275,11 @@ void AddCustomScripts()
 {
 #ifdef SCRIPTS
     /* This is where custom scripts should be added. */
-
+	AddSC_zertharion();
+	AddSC_yamix();
+	AddSC_boss_sega();
+	AddSC_boss_aregos();
+	AddSC_boss_father();
+	AddSC_boss_cromatus();
 #endif
 }

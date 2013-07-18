@@ -10,6 +10,12 @@
 
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
+  Custom\AhnQuirajEvento\boss_zertharion.cpp
+  Custom\AhnQuirajEvento\boss_yamix.cpp
+  Custom\AhnQuirajEvento\boss_aregos.cpp
+  Custom\AhnQuirajEvento\boss_segasuenos.cpp
+  Custom\AhnQuirajEvento\boss_father.cpp
+  Custom\AhnQuirajEvento\boss_cromatus.cpp
 )
 
 message("  -> Prepared: Custom")
