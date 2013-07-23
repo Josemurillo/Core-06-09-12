@@ -466,7 +466,7 @@ class VileSpiritActivateEvent : public BasicEvent
         bool Execute(uint64 /*time*/, uint32 /*diff*/)
         {
             _owner->SetReactState(REACT_AGGRESSIVE);
-            _owner->CastSpell(_owner, SPELL_VILE_SPIRIT_MOVE_SEARCH, true);
+            //_owner->CastSpell(_owner, SPELL_VILE_SPIRIT_MOVE_SEARCH, true);
             _owner->CastSpell((Unit*)NULL, SPELL_VILE_SPIRIT_DAMAGE_SEARCH, true);
             return true;
         }
@@ -485,7 +485,7 @@ class TriggerWickedSpirit : public BasicEvent
 
         bool Execute(uint64 /*time*/, uint32 /*diff*/)
         {
-            _owner->CastCustomSpell(SPELL_TRIGGER_VILE_SPIRIT_HEROIC, SPELLVALUE_MAX_TARGETS, 1, NULL, true);
+            //_owner->CastCustomSpell(SPELL_TRIGGER_VILE_SPIRIT_HEROIC, SPELLVALUE_MAX_TARGETS, 1, NULL, true);
 
             if (--_counter)
             {
