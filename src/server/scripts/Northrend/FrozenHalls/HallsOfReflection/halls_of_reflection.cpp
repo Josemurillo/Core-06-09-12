@@ -185,13 +185,13 @@ public:
             case GOSSIP_ACTION_INFO_DEF+1:
                 player->CLOSE_GOSSIP_MENU();
                 if (creature->AI())
-                    creature->AI()->DoAction(ACTION_START_INTRO);
+                    //creature->AI()->DoAction(ACTION_START_INTRO);
                 creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
                 player->CLOSE_GOSSIP_MENU();
                 if (creature->AI())
-                    creature->AI()->DoAction(ACTION_SKIP_INTRO);
+                    //creature->AI()->DoAction(ACTION_SKIP_INTRO);
                 creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 break;
         }
