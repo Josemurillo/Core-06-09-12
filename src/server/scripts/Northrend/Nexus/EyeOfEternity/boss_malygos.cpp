@@ -94,7 +94,12 @@ enum Spells
     SPELL_ARCANE_OVERLOAD = 56432,
     SPELL_SUMMOM_RED_DRAGON = 56070,
     SPELL_SURGE_POWER_PHASE_3 = 57407,
-    SPELL_STATIC_FIELD = 57430
+    SPELL_STATIC_FIELD = 57430,
+	
+	// Scion of Eternity
+	SPELL_ARCANE_BARRAGE	= 56397,  //Se repite cada 12 seg
+	// Nexus Lord
+	SPELL_HASTE				= 57060,  //Se repite cada 15 seg
 };
 
 enum Movements
@@ -471,7 +476,7 @@ public:
             me->GetMotionMaster()->MoveIdle();
             me->GetMotionMaster()->MovePoint(MOVE_DEEP_BREATH_ROTATION, MalygosPhaseTwoWaypoints[0]);
 
-            for (uint8 i = 0; i < 2; i++)
+            /*for (uint8 i = 0; i < 2; i++)
             {
                 // Starting position. One starts from the first waypoint and another from the last.
                 uint8 pos = !i ? MAX_HOVER_DISK_WAYPOINTS-1 : 0;
@@ -482,7 +487,18 @@ public:
                 // not sure about its position.
                 if (Creature* summon = me->SummonCreature(NPC_HOVER_DISK_MELEE, HoverDiskWaypoints[0]))
                     summon->SetInCombatWithZone();
-            }
+            }*/
+			
+			for(uint8 i = 0; i < 4; i++){
+				uint8 rango = urand(0,1);
+				uint8 summon = urand(0,17);
+				if(rango == 0){
+					me->SummonCreature(NPC_NEXUS_LORD, HoverDiskWaypoints[summon],TEMPSUMMON_CORPSE_DESPAWN);
+				}
+				else{
+					me->SummonCreature(NPC_SCION_OF_ETERNITI, HoverDiskWaypoints[summon],TEMPSUMMON_CORPSE_DESPAWN);
+				}
+			}
         }
 
         void UpdateAI(uint32 const diff)
@@ -1148,6 +1164,122 @@ class achievement_denyin_the_scion : public AchievementCriteriaScript
         }
 };
 
+class npc_lord_nexus : public CreatureScript
+{
+public:
+    npc_lord_nexus() : CreatureScript("npc_lord_nexus") {}
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_lord_nexusAI (creature);
+    }
+
+    struct npc_lord_nexusAI : public ScriptedAI
+    {
+        npc_lord_nexusAI(Creature* creature) : ScriptedAI(creature) {
+
+			_instance = creature->GetInstanceScript();
+		}
+	
+	uint32 hasteTemp;
+	uint32 arcaneBarrageTemp;
+	
+	void Reset(){
+	
+		hasteTemp = 15000;
+		arcaneBarrageTemp = 12000;
+	}
+	
+	void EnterEvadeMode()
+    {
+		me->DespawnOrUnsummon();
+    }
+	
+	void JustDied(Unit* /*killer*/)
+    {
+		if (Creature* malygos = Unit::GetCreature(*me, _instance->GetData64(DATA_MALYGOS)))
+           malygos->AI()->SetData(DATA_SUMMON_DEATHS, malygos->AI()->GetData(DATA_SUMMON_DEATHS)+1);
+    }
+	
+	void UpdateAI(uint32 const diff){
+
+		if(hasteTemp <= diff){
+			if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM,0)){
+				DoCast(target,SPELL_HASTE);
+			}
+			hasteTemp = 15000;
+		}
+		else hasteTemp -= diff;
+
+		if(arcaneBarrageTemp <= diff){
+			if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM,0)){
+				DoCast(target,SPELL_ARCANE_BARRAGE);
+			}
+			arcaneBarrageTemp = 12000;
+		}
+		else arcaneBarrageTemp -= diff;
+	
+	}
+
+	 private:
+        InstanceScript* _instance;
+
+	};
+};
+
+
+class npc_scion_of_eternity : public CreatureScript
+{
+public:
+    npc_scion_of_eternity() : CreatureScript("npc_scion_of_eternity") {}
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_scion_of_eternityAI (creature);
+    }
+
+    struct npc_scion_of_eternityAI : public ScriptedAI
+    {
+        npc_scion_of_eternityAI(Creature* creature) : ScriptedAI(creature) {
+			_instance = creature->GetInstanceScript();
+		}
+
+	uint32 arcaneBarrageTemp;
+	
+	void Reset(){
+		
+		arcaneBarrageTemp = 12000;
+	}
+	
+	void EnterEvadeMode()
+    {
+        me->DespawnOrUnsummon();
+    }
+	
+	void JustDied(Unit* /*killer*/)
+    {
+        if (Creature* malygos = Unit::GetCreature(*me, _instance->GetData64(DATA_MALYGOS)))
+           malygos->AI()->SetData(DATA_SUMMON_DEATHS, malygos->AI()->GetData(DATA_SUMMON_DEATHS)+1);
+    }
+	
+	void UpdateAI(uint32 const diff){
+
+		if(arcaneBarrageTemp <= diff){
+			if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM,0)){
+				DoCast(target,SPELL_ARCANE_BARRAGE);
+			}
+			arcaneBarrageTemp = 12000;
+		}
+		else arcaneBarrageTemp -=diff;
+	
+	}
+
+	private:
+        InstanceScript* _instance;
+
+	};
+};
+
 void AddSC_boss_malygos()
 {
     new boss_malygos();
@@ -1160,4 +1292,6 @@ void AddSC_boss_malygos()
     new spell_malygos_vortex_visual();
     new npc_alexstrasza_eoe();
     new achievement_denyin_the_scion();
+	new npc_lord_nexus();
+	new npc_scion_of_eternity();
 }

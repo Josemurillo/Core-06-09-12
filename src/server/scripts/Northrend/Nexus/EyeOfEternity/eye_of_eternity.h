@@ -44,7 +44,9 @@ enum InstanceNpcs
     NPC_HOVER_DISK_CASTER   = 30248,
     NPC_ARCANE_OVERLOAD     = 30282,
     NPC_WYRMREST_SKYTALON   = 30161,
-    NPC_ALEXSTRASZA         = 32295
+    NPC_ALEXSTRASZA         = 32295,
+	NPC_NEXUS_LORD			= 30245,
+	NPC_SCION_OF_ETERNITI	= 30249,
 };
 
 enum InstanceGameObjects
