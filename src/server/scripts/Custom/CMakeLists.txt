@@ -16,6 +16,7 @@ set(scripts_STAT_SRCS
   Custom\AhnQuirajEvento\boss_segasuenos.cpp
   Custom\AhnQuirajEvento\boss_father.cpp
   Custom\AhnQuirajEvento\boss_cromatus.cpp
+  Custom\icc_rings_recovery.cpp
 )
 
 message("  -> Prepared: Custom")
