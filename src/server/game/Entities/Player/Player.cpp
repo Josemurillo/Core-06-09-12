@@ -2091,8 +2091,23 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     if (!InBattleground() && mEntry->IsBattlegroundOrArena())
         return false;
 
+	if ( ((getLevel() < 68) && (mapid == 571)) || ((getLevel() < 58) && (mapid == 530)) )
+	{
+		if (GetTransport())
+        {
+            m_transport->RemovePassenger(this);
+            m_transport = NULL;
+            m_movementInfo.t_pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
+            m_movementInfo.t_time = 0;
+            m_movementInfo.t_seat = -1;
+            RepopAtGraveyard();                             // teleport to near graveyard if on transport, looks blizz like :)
+        }
+
+		return false;
+	}
+
     // client without expansion support
-    if (GetSession()->Expansion() < mEntry->Expansion())
+    if ((GetSession()->Expansion() < mEntry->Expansion()))
     {
         sLog->outDebug(LOG_FILTER_MAPS, "Player %s using client without required expansion tried teleport to non accessible map %u", GetName(), mapid);
 
