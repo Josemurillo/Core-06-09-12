@@ -236,13 +236,13 @@ public:
 
             m_uiMovementTimer = 1000;
             m_uiSummonTimer = 10000;
-            me->SetInCombatWithZone();
+            //me->SetInCombatWithZone();
             if (instance)
             {
                 instance->SetData(DATA_SKADI_THE_RUTHLESS_EVENT, IN_PROGRESS);
                 instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
                 me->GetMotionMaster()->MoveJump(Location[0].GetPositionX(), Location[0].GetPositionY(), Location[0].GetPositionZ(), 5.0f, 10.0f);
-                me->SetWalk(false);
+                //me->SetWalk(false);
                 m_uiMountTimer = 1000;
                 Summons.DespawnEntry(CREATURE_GRAUF);
             }
@@ -288,11 +288,6 @@ public:
                     Phase = SKADI;
                     me->SetCanFly(false);
                     me->Dismount();
-                    if (Creature* pGrauf = me->SummonCreature(CREATURE_GRAUF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3*IN_MILLISECONDS))
-                    {
-                        pGrauf->GetMotionMaster()->MoveFall();
-                        pGrauf->HandleEmoteCommand(EMOTE_ONESHOT_FLYDEATH);
-                    }
                     me->GetMotionMaster()->MoveJump(Location[4].GetPositionX(), Location[4].GetPositionY(), Location[4].GetPositionZ(), 5.0f, 10.0f);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                     DoScriptText(SAY_DRAKE_DEATH, me);
@@ -300,9 +295,21 @@ public:
                     m_uiPoisonedSpearTimer = 10000;
                     m_uiWhirlwindTimer = 20000;
                     me->AI()->AttackStart(SelectTarget(SELECT_TARGET_RANDOM));
+					me->SetWalk(true);
                 }
             }
         }
+		
+		void DamageTaken(Unit* who, uint32& damage)
+            {
+				switch (Phase)
+				{
+					case FLYING:
+						damage = 0;
+						break;
+				}
+                
+            }
 
         void UpdateAI(const uint32 diff)
         {
