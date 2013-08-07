@@ -85,6 +85,13 @@ enum SWPActions
     DO_BANISH                                    =  2,
 };
 
+enum npcandobject
+{
+
+	NPC_SATHORVARR 								 = 24892,
+
+};
+
 #define GO_FAILED   "You are unable to use this currently."
 
 #define EMOTE_UNABLE_TO_FIND    "is unable to find Kalecgos"
@@ -104,6 +111,8 @@ enum SWPActions
 
 uint32 WildMagic[] = { 44978, 45001, 45002, 45004, 45006, 45010 };
 
+bool died;
+
 class boss_kalecgos : public CreatureScript
 {
 public:
@@ -121,7 +130,6 @@ public:
             instance = creature->GetInstanceScript();
             SathGUID = 0;
             DoorGUID = 0;
-            bJustReset = false;
             me->setActive(true);
         }
 
@@ -137,10 +145,7 @@ public:
         uint32 TalkSequence;
         uint32 ResetTimer;
 
-        bool isFriendly;
-        bool isEnraged;
         bool isBanished;
-        bool bJustReset;
 
         uint64 SathGUID;
         uint64 DoorGUID;
@@ -157,13 +162,10 @@ public:
                 Sath->AI()->EnterEvadeMode();
 
             me->setFaction(14);
-            if (!bJustReset) //first reset at create
-            {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE + UNIT_FLAG_NOT_SELECTABLE);
-                me->SetDisableGravity(false);
-                me->SetVisible(true);
-                me->SetStandState(UNIT_STAND_STATE_SLEEP);
-            }
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE + UNIT_FLAG_NOT_SELECTABLE);
+            me->SetDisableGravity(false);
+            me->SetStandState(UNIT_STAND_STATE_SLEEP);
+          
             me->SetFullHealth();//dunno why it does not resets health at evade..
             ArcaneBuffetTimer = 8000;
             FrostBreathTimer = 15000;
@@ -175,16 +177,12 @@ public:
 
             TalkTimer = 0;
             TalkSequence = 0;
-            isFriendly = false;
-            isEnraged = false;
             isBanished = false;
+			died = false;
         }
 
         void EnterEvadeMode()
         {
-            bJustReset = true;
-            me->SetVisible(false);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE + UNIT_FLAG_NOT_SELECTABLE);
             ScriptedAI::EnterEvadeMode();
         }
 
@@ -193,7 +191,6 @@ public:
             switch (param)
             {
                 case DO_ENRAGE:
-                    isEnraged = true;
                     me->CastSpell(me, SPELL_ENRAGE, true);
                     break;
                 case DO_BANISH:
@@ -205,41 +202,18 @@ public:
 
         void UpdateAI(const uint32 diff)
         {
-            if (TalkTimer)
+            if (died)
             {
-                if (!TalkSequence)
-                {
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE + UNIT_FLAG_NOT_SELECTABLE);
                     me->InterruptNonMeleeSpells(true);
                     me->RemoveAllAuras();
                     me->DeleteThreatList();
                     me->CombatStop();
                     ++TalkSequence;
-                }
-                if (TalkTimer <= diff)
-                {
-                    if (isFriendly)
-                        GoodEnding();
-                    else
-                        BadEnding();
-                    ++TalkSequence;
-                } else TalkTimer -= diff;
+                    GoodEnding();
             }
             else
             {
-                if (bJustReset)
-                {
-                    if (ResetTimer <= diff)
-                    {
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
-                        me->SetDisableGravity(false);
-                        me->SetVisible(true);
-                        me->SetStandState(UNIT_STAND_STATE_SLEEP);
-                        ResetTimer = 10000;
-                        bJustReset = false;
-                    } else ResetTimer -= diff;
-                    return;
-                }
                 if (!UpdateVictim())
                     return;
 
@@ -250,7 +224,7 @@ public:
                         me->AI()->EnterEvadeMode();
                         return;
                     }
-                    if (HealthBelowPct(10) && !isEnraged)
+                    if (HealthBelowPct(10))
                     {
                         if (Creature* Sath = Unit::GetCreature(*me, SathGUID))
                             Sath->AI()->DoAction(DO_ENRAGE);
@@ -258,22 +232,9 @@ public:
                     }
                     if (!isBanished && HealthBelowPct(1))
                     {
-                        if (Creature* Sath = Unit::GetCreature(*me, SathGUID))
-                        {
-                            if (Sath->HasAura(SPELL_BANISH))
-                            {
-                                Sath->DealDamage(Sath, Sath->GetHealth());
-                                return;
-                            }
-                            else
-                                DoAction(DO_BANISH);
-                        }
-                        else
-                        {
-                            sLog->outError(LOG_FILTER_TSCR, "Didn't find Shathrowar. Kalecgos event reseted.");
-                            EnterEvadeMode();
-                            return;
-                        }
+                        DoAction(DO_BANISH);
+						me->SummonCreature(NPC_SATHORVARR,1704.22f,924.758f,53.1608f,1.53589f,TEMPSUMMON_CORPSE_TIMED_DESPAWN, 600000);
+
                     }
                     CheckTimer = 1000;
                 } else CheckTimer -= diff;
@@ -329,8 +290,6 @@ public:
 
         void MoveInLineOfSight(Unit* who)
         {
-            if (bJustReset)//boss is invisible, don't attack
-                return;
 
             if (!me->getVictim() && me->IsValidAttackTarget(who))
             {
@@ -365,27 +324,6 @@ public:
         {
             if (type != POINT_MOTION_TYPE)
                 return;
-            me->SetVisible(false);
-            if (isFriendly)
-            {
-                me->setDeathState(JUST_DIED);
-
-                Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                if (!players.isEmpty())
-                {
-                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                    {
-                        Player* player = itr->getSource();
-                        if (player)
-                            me->GetMap()->ToInstanceMap()->PermBindAllPlayers(player);
-                    }
-                }
-            }
-            else
-            {
-                me->GetMotionMaster()->MoveTargetedHome();
-                TalkTimer = 1000;
-            }
         }
 
         void GoodEnding()
@@ -403,6 +341,7 @@ public:
             case 3:
                 me->SetDisableGravity(true);
                 me->GetMotionMaster()->MovePoint(0, FLY_X, FLY_Y, FLY_Z);
+				me->DespawnOrUnsummon(20000);
                 TalkTimer = 600000;
                 break;
             default:
@@ -622,54 +561,22 @@ public:
             isBanished = false;
 
             me->CastSpell(me, AURA_DEMONIC_VISUAL, true);
-            TeleportAllPlayersBack();
         }
 
         void EnterCombat(Unit* /*who*/)
         {
-            if (Creature* Kalec = me->SummonCreature(MOB_KALEC, me->GetPositionX() + 10, me->GetPositionY() + 5, me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 0))
-            {
-                KalecGUID = Kalec->GetGUID();
-                me->CombatStart(Kalec);
-                me->AddThreat(Kalec, 100.0f);
-                Kalec->setActive(true);
-            }
             DoScriptText(SAY_SATH_AGGRO, me);
-        }
-
-        void DamageTaken(Unit* done_by, uint32 &damage)
-        {
-            if (damage >= me->GetHealth() && done_by != me)
-                damage = 0;
         }
 
         void KilledUnit(Unit* target)
         {
-            if (target->GetGUID() == KalecGUID)
-            {
-                TeleportAllPlayersBack();
-                if (Creature* Kalecgos = Unit::GetCreature(*me, KalecgosGUID))
-                {
-                    CAST_AI(boss_kalecgos::boss_kalecgosAI, Kalecgos->AI())->TalkTimer = 1;
-                    CAST_AI(boss_kalecgos::boss_kalecgosAI, Kalecgos->AI())->isFriendly = false;
-                }
-                EnterEvadeMode();
-                return;
-            }
             DoScriptText(RAND(SAY_SATH_SLAY1, SAY_SATH_SLAY2), me);
         }
 
         void JustDied(Unit* /*killer*/)
         {
             DoScriptText(SAY_SATH_DEATH, me);
-            me->SetPosition(me->GetPositionX(), me->GetPositionY(), DRAGON_REALM_Z, me->GetOrientation());
-            TeleportAllPlayersBack();
-            if (Creature* Kalecgos = Unit::GetCreature(*me, KalecgosGUID))
-            {
-                CAST_AI(boss_kalecgos::boss_kalecgosAI, Kalecgos->AI())->TalkTimer = 1;
-                CAST_AI(boss_kalecgos::boss_kalecgosAI, Kalecgos->AI())->isFriendly = true;
-            }
-
+            died = true;
             if (instance)
                 instance->SetData(DATA_KALECGOS_EVENT, DONE);
         }
@@ -691,73 +598,15 @@ public:
             }
         }
 
-        void DoAction(const int32 param)
-        {
-            switch (param)
-            {
-                case DO_ENRAGE:
-                    isEnraged = true;
-                    me->CastSpell(me, SPELL_ENRAGE, true);
-                    break;
-                case DO_BANISH:
-                    isBanished = true;
-                    me->CastSpell(me, SPELL_BANISH, true);
-                    break;
-            }
-        }
+		void EnterEvadeMode(){
+			me->DespawnOrUnsummon();
+		}
 
         void UpdateAI(const uint32 diff)
         {
-            if (!me->HasAura(AURA_SPECTRAL_INVISIBILITY))
-                me->CastSpell(me, AURA_SPECTRAL_INVISIBILITY, true);
+            
             if (!UpdateVictim())
                 return;
-
-            if (CheckTimer <= diff)
-            {
-                Creature* Kalec = Unit::GetCreature(*me, KalecGUID);
-                if (!Kalec || (Kalec && !Kalec->isAlive()))
-                {
-                    if (Creature* Kalecgos = Unit::GetCreature(*me, KalecgosGUID))
-                        Kalecgos->AI()->EnterEvadeMode();
-                        return;
-                }
-                if (HealthBelowPct(10) && !isEnraged)
-                {
-                    if (Creature* Kalecgos = Unit::GetCreature(*me, KalecgosGUID))
-                        Kalecgos->AI()->DoAction(DO_ENRAGE);
-                    DoAction(DO_ENRAGE);
-                }
-                Creature* Kalecgos = Unit::GetCreature(*me, KalecgosGUID);
-                if (Kalecgos)
-                {
-                    if (!Kalecgos->isInCombat())
-                    {
-                        me->AI()->EnterEvadeMode();
-                        return;
-                    }
-                }
-                if (!isBanished && HealthBelowPct(1))
-                {
-                    if (Kalecgos)
-                    {
-                        if (Kalecgos->HasAura(SPELL_BANISH))
-                        {
-                            me->DealDamage(me, me->GetHealth());
-                            return;
-                        }
-                        else
-                            DoAction(DO_BANISH);
-                    }
-                    else
-                    {
-                        me->MonsterTextEmote(EMOTE_UNABLE_TO_FIND, 0);
-                        EnterEvadeMode();
-                        return;
-                    }
-                }
-                CheckTimer = 1000;
-            } else CheckTimer -= diff;
 
             if (ResetThreat <= diff)
             {
