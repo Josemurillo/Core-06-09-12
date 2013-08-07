@@ -2090,7 +2090,18 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     // don't let gm level > 1 either
     if (!InBattleground() && mEntry->IsBattlegroundOrArena())
         return false;
+	
+	// Terrallende level inferior a 58
+	if ((getLevel() < 58) && mapid == 530){
+		RepopAtGraveyard();
+		return false;
+	}
 
+	// Rasganorte level inferior a 68
+	if ((getLevel() < 68) && mapid == 571){
+		RepopAtGraveyard();
+		return false;
+	}
     // client without expansion support
     if (GetSession()->Expansion() < mEntry->Expansion())
     {
