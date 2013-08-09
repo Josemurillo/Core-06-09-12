@@ -515,7 +515,8 @@ public:
                 return;
 
             if (me->HealthBelowPct(10) && !BelowTenPercent && !Enraged)
-                BelowTenPercent = true;
+				// Evita que salgan add y que tire el dedo de la muerte para que se puedan sacar el logro.
+                //BelowTenPercent = true;
 
             if (!Enraged)
             {
