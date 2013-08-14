@@ -119,6 +119,7 @@ class spell_hun_chimera_shot : public SpellScriptLoader
                 {
                     uint32 spellId = 0;
                     int32 basePoint = 0;
+					uint32 baseMana = 0;
                     Unit::AuraApplicationMap& Auras = unitTarget->GetAppliedAuras();
                     for (Unit::AuraApplicationMap::iterator i = Auras.begin(); i != Auras.end(); ++i)
                     {
@@ -143,16 +144,18 @@ class spell_hun_chimera_shot : public SpellScriptLoader
                             }
                             // Viper Sting - Instantly restores mana to you equal to 60% of the total amount drained by your Viper Sting.
                             else if (familyFlag[1] & 0x00000080)
-                            {
-                                int32 TickCount = aura->GetEffect(0)->GetTotalTicks();
+                            {	
+								baseMana = unitTarget->GetMaxPower(POWER_MANA);
                                 spellId = HUNTER_SPELL_CHIMERA_SHOT_VIPER;
-
+								/*
+								int32 TickCount = aura->GetEffect(0)->GetTotalTicks();
                                 // Amount of one aura tick
                                 basePoint = int32(CalculatePctN(unitTarget->GetMaxPower(POWER_MANA), aurEff->GetAmount()));
-                                int32 casterBasePoint = aurEff->GetAmount() * unitTarget->GetMaxPower(POWER_MANA) / 50; // TODO: WTF? caster uses unitTarget?
-                                if (basePoint > casterBasePoint)
-                                    basePoint = casterBasePoint;
-                                ApplyPctN(basePoint, TickCount * 60);
+                                int32 casterBasePoint = aurEff->GetAmount() * unitTarget->GetMaxPower(POWER_MANA) / 50; // TODO: WTF? caster uses unitTarget?*/
+								if(baseMana != 0){
+									basePoint = ((caster->GetMaxPower(POWER_MANA) * 0.04) * 0.6);
+								}
+								
                             }
                             // Scorpid Sting - Attempts to Disarm the target for 10 sec. This effect cannot occur more than once per 1 minute.
                             else if (familyFlag[0] & 0x00008000)
