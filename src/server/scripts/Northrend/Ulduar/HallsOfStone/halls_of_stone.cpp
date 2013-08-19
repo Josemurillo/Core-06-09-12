@@ -406,6 +406,8 @@ public:
         void JustSummoned(Creature* summoned)
         {
             lDwarfGUIDList.push_back(summoned->GetGUID());
+			summoned->setActive(true);
+            summoned->SetInCombatWithZone();
             summoned->AddThreat(me, 0.0f);
             summoned->AI()->AttackStart(me);
         }
