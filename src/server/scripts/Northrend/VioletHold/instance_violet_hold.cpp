@@ -396,7 +396,9 @@ public:
                     {
                         if (GameObject* pMainDoor = instance->GetGameObject(uiMainDoor))
                             pMainDoor->SetGoState(GO_STATE_READY);
-                        uiWaveCount = 1;
+                        if(uiWaveCount == 0){
+						uiWaveCount = 1;
+						}
                         bActive = true;
                         uiRemoveNpc = 0; // might not have been reset after a wipe on a boss.
                     }
@@ -553,18 +555,21 @@ public:
                     if (pBoss->isDead())
                     {
                         // respawn but avoid to be looted again
-                        pBoss->Respawn();
+                        //pBoss->Respawn();
                         pBoss->RemoveLootMode(1);
                     }
                     pBoss->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_NON_ATTACKABLE);
-                    uiWaveCount = 0;
+                    //uiWaveCount = 0;
                 }
             }
         }
 
         void AddWave()
         {
-            DoUpdateWorldState(WORLD_STATE_VH, 1);
+			if(uiWaveCount <= 1){
+				DoUpdateWorldState(WORLD_STATE_VH, 1);
+			}
+            
             DoUpdateWorldState(WORLD_STATE_VH_WAVE_COUNT, uiWaveCount);
 
             switch (uiWaveCount)
@@ -599,6 +604,7 @@ public:
                     Creature* pSinclari = instance->GetCreature(uiSinclari);
                     if (pSinclari)
                         pSinclari->SummonCreature(CREATURE_CYANIGOSA, CyanigosasSpawnLocation, TEMPSUMMON_DEAD_DESPAWN);
+						uiCyanigosaEventPhase = 1;
                     break;
                 }
                 case 1:
@@ -679,6 +685,65 @@ public:
             return true;
         }
 
+		void comprobarBosses(){
+				Creature* boss = NULL;
+				for(uint32 i = 0; i <= 5; i++ ){
+					switch (i){
+						case 0:
+							boss = instance->GetCreature(uiMoragg);
+							if(boss->isDead()){
+								boss->Respawn();
+								boss->RemoveLootMode(1);
+							}
+						 break;
+						case 1:
+							boss = instance->GetCreature(uiErekem);
+							if(boss->isDead()){
+								boss->Respawn();
+								boss->RemoveLootMode(1);
+								
+								if(Creature* ayu1 = instance->GetCreature(uiErekemGuard[0])){
+									ayu1->Respawn();
+									ayu1->RemoveLootMode(1);
+								}
+								if(Creature* ayu2 = instance->GetCreature(uiErekemGuard[1])){
+									ayu2->Respawn();
+									ayu2->RemoveLootMode(1);
+								}
+							}
+						 break;
+						case 2:
+							boss = instance->GetCreature(uiIchoron);
+							if(boss->isDead()){
+								boss->Respawn();
+								boss->RemoveLootMode(1);
+							}
+							break;
+						case 3:
+							boss = instance->GetCreature(uiLavanthor);
+							if(boss->isDead()){
+								boss->Respawn();
+								boss->RemoveLootMode(1);
+							}
+							break;
+						case 4:
+							boss = instance->GetCreature(uiXevozz);
+							if(boss->isDead()){
+								boss->Respawn();
+								boss->RemoveLootMode(1);
+							}
+							break;
+						case 5:
+							boss = instance->GetCreature(uiZuramat);
+							if(boss->isDead()){
+								boss->Respawn();
+								boss->RemoveLootMode(1);
+							}
+							break;
+					}
+				}
+		}
+
         void Update(uint32 diff)
         {
             if (!instance->HavePlayers())
@@ -687,6 +752,10 @@ public:
             // portals should spawn if other portal is dead and doors are closed
             if (bActive && uiMainEventPhase == IN_PROGRESS)
             {
+				if(uiWaveCount <= 1){
+					comprobarBosses();
+				}
+				
                 if (uiActivationTimer < diff)
                 {
                     AddWave();
@@ -699,12 +768,12 @@ public:
             // if main event is in progress and players have wiped then reset instance
             if ( uiMainEventPhase == IN_PROGRESS && CheckWipe())
             {
-                SetData(DATA_REMOVE_NPC, 1);
-                StartBossEncounter(uiFirstBoss, false);
-                StartBossEncounter(uiSecondBoss, false);
+                //SetData(DATA_REMOVE_NPC, 1);
+                //StartBossEncounter(uiFirstBoss, false);
+                //StartBossEncounter(uiSecondBoss, false);
 
                 SetData(DATA_MAIN_DOOR, GO_STATE_ACTIVE);
-                SetData(DATA_WAVE_COUNT, 0);
+                //SetData(DATA_WAVE_COUNT, 0);
                 uiMainEventPhase = NOT_STARTED;
 
                 if (Creature* pSinclari = instance->GetCreature(uiSinclari))
