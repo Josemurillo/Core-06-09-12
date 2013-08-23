@@ -97,6 +97,8 @@ enum Says
     SAY_PALETRESS_NIGHTMARE_WARNING = -1999912,  // Convert to script_texts
 };
 
+uint32 memo[14] = {35030,35046,35028,35029,35039,35047,35045,35048,35049,35038,35034,35040,35042,35031};
+
 class OrientationCheck : public std::unary_function<Unit*, bool>
 {
     public:
@@ -458,7 +460,11 @@ public:
                 me->InterruptNonMeleeSpells(true);
                 DoCastAOE(SPELL_HOLY_NOVA, false);
                 DoCast(me, SPELL_SHIELD);
-                DoCast(me,SPELL_SUMMON_MEMORY);
+                //DoCast(me,SPELL_SUMMON_MEMORY);
+				uint32 randmemo = urand(0,13);
+				if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM,0)){
+					me->SummonCreature(memo[randmemo],target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(),TEMPSUMMON_CORPSE_DESPAWN);
+				}
                 DoCastAOE(SPELL_CONFESS, false);
                 Talk(SAY_PALETRESS_SUMMON_MEMORY);
 
@@ -574,6 +580,12 @@ public:
             wakingNightmareTimer = 7000;
             DoCast(SPELL_SHADOW_FORM);
         }
+		
+		void EnterEvadeMode(){
+		
+			me->DespawnOrUnsummon();
+		
+		}
 
         void UpdateAI(const uint32 diff)
         {
