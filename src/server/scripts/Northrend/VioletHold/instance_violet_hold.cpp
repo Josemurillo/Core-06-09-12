@@ -768,7 +768,7 @@ public:
             // if main event is in progress and players have wiped then reset instance
             if ( uiMainEventPhase == IN_PROGRESS && CheckWipe())
             {
-                //SetData(DATA_REMOVE_NPC, 1);
+                SetData(DATA_REMOVE_NPC, 1);
                 //StartBossEncounter(uiFirstBoss, false);
                 //StartBossEncounter(uiSecondBoss, false);
 
