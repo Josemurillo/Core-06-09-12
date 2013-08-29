@@ -363,10 +363,14 @@ class npc_bone_spike : public CreatureScript
 
             void JustDied(Unit* /*killer*/)
             {
-                if (TempSummon* summ = me->ToTempSummon())
-                    if (Unit* trapped = summ->GetSummoner())
+                if (TempSummon* summ = me->ToTempSummon()){
+                    if (Unit* trapped = summ->GetSummoner()){
                         trapped->RemoveAurasDueToSpell(SPELL_IMPALED);
-
+						trapped->RemoveAurasDueToSpell(SPELL_RIDE_VEHICLE);
+						
+					}	
+				}
+				
                 me->DespawnOrUnsummon();
             }
 
@@ -374,12 +378,15 @@ class npc_bone_spike : public CreatureScript
             {
                 me->DespawnOrUnsummon();
                 victim->RemoveAurasDueToSpell(SPELL_IMPALED);
+				victim->RemoveAurasDueToSpell(SPELL_RIDE_VEHICLE);
+				
             }
 
             void IsSummonedBy(Unit* summoner)
             {
                 DoCast(summoner, SPELL_IMPALED);
-                summoner->CastSpell(me, SPELL_RIDE_VEHICLE, true);
+                //summoner->CastSpell(me, SPELL_RIDE_VEHICLE, true);
+				me->AddAura(SPELL_RIDE_VEHICLE,summoner);
                 _events.ScheduleEvent(EVENT_FAIL_BONED, 8000);
                 _hasTrappedUnit = true;
             }
