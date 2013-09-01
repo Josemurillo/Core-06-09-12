@@ -2925,6 +2925,13 @@ void SpellMgr::LoadSpellCustomAttr()
             case 72293: // Mark of the Fallen Champion (Deathbringer Saurfang)
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE_EFF0;
                 break;
+			
+			case 49224:
+			case 49610:
+			case 49611:
+				spellInfo->ProcCharges = 0;
+				break;	
+			
             default:
                 break;
         }
