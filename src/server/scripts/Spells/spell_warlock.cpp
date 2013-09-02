@@ -45,6 +45,7 @@ enum WarlockSpells
     WARLOCK_IMPROVED_HEALTH_FUNNEL_R2       = 18704,
     WARLOCK_IMPROVED_HEALTH_FUNNEL_BUFF_R1  = 60955,
     WARLOCK_IMPROVED_HEALTH_FUNNEL_BUFF_R2  = 60956,
+    WARLOCK_GLYPH_OF_SUCCUBUS               = 56250,
 };
 
 class spell_warl_banish : public SpellScriptLoader
@@ -531,6 +532,41 @@ class spell_warl_demonic_circle_teleport : public SpellScriptLoader
         }
 };
 
+class spell_warl_seduction : public SpellScriptLoader
+{
+    public:
+        spell_warl_seduction() : SpellScriptLoader("spell_warl_seduction") { }
+
+        class spell_warl_seduction_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warl_seduction_SpellScript);
+
+            void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+            {
+                Unit* caster = GetCaster();
+                if (Unit* target = GetHitUnit())
+                {
+                    if (caster->GetOwner() && caster->GetOwner()->HasAura(WARLOCK_GLYPH_OF_SUCCUBUS))
+                    {
+                        target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, target->GetAura(32409)); // SW:D shall not be removed.
+                        target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
+                        target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_warl_seduction_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warl_seduction_SpellScript();
+        }
+};
+
 class spell_warl_haunt : public SpellScriptLoader
 {
     public:
@@ -733,4 +769,5 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_unstable_affliction();
     new spell_warl_curse_of_doom();
     new spell_warl_health_funnel();
+	new spell_warl_seduction();
 }
