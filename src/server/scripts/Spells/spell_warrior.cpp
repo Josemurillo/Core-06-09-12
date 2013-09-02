@@ -281,7 +281,7 @@ class spell_warr_slam : public SpellScriptLoader
             {
                 int32 bp0 = GetEffectValue();
                 if (GetHitUnit())
-                    GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_SLAM, &bp0, NULL, NULL, true, 0);
+                    GetCaster()->CastCustomSpell(SPELL_SLAM, SPELLVALUE_BASE_POINT0, GetEffectValue(), GetHitUnit(), TRIGGERED_FULL_MASK);
             }
 
             void Register()
