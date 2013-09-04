@@ -448,7 +448,7 @@ public:
 
             if (FlameBlastTimer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_BLAZE_SUMMON, true); // appear at victim
+                //DoCast(me->getVictim(), SPELL_BLAZE_SUMMON, true); // appear at victim
                 DoCast(me->getVictim(), SPELL_FLAME_BLAST);
                 FlameBlastTimer = 15000; // 10000 is official-like?
                 DoZoneInCombat(); // in case someone is revived
@@ -767,7 +767,7 @@ public:
 
             // Trigger->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetTarget(Trigger->GetGUID());
-            DoCast(Trigger, SPELL_EYE_BLAST);
+            //DoCast(Trigger, SPELL_EYE_BLAST);
         }
         void SummonFlamesOfAzzinoth()
         {
@@ -791,11 +791,11 @@ public:
             }
         }
         void SummonMaiev()
-        {
-            DoCast(me, SPELL_SHADOW_PRISON, true);
+        {	
+            //DoCast(me, SPELL_SHADOW_PRISON, true);
             DoCast(me, 40403, true);
             if (!MaievGUID) // If Maiev cannot be summoned, reset the encounter and post some errors to the console.
-            {
+            {	
                 EnterEvadeMode();
                 me->MonsterTextEmote(EMOTE_UNABLE_TO_SUMMON, 0);
                 sLog->outError(LOG_FILTER_TSCR, "SD2 ERROR: Unable to summon Maiev Shadowsong (entry: 23197). Check your database to see if you have the proper SQL for Maiev Shadowsong (entry: 23197)");
@@ -1044,7 +1044,7 @@ public:
                     break;
 
                 case EVENT_FLAME_CRASH:
-                    DoCast(me->getVictim(), SPELL_FLAME_CRASH);
+                    //DoCast(me->getVictim(), SPELL_FLAME_CRASH);
                     Timer[EVENT_FLAME_CRASH] = urand(30000, 40000);
                     break;
 
@@ -1348,7 +1348,7 @@ public:
                     if (Phase == PHASE_NORMAL_MAIEV)
                     {
                         BlinkToPlayer();
-                        DoCast(me, SPELL_CAGE_TRAP_SUMMON);
+                        //DoCast(me, SPELL_CAGE_TRAP_SUMMON);
                         Timer[EVENT_MAIEV_TRAP] = 22000;
                     }
                     else
