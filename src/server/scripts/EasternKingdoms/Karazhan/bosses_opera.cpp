@@ -138,7 +138,7 @@ public:
 
             WaterBoltTimer = 5000;
             FearTimer = 15000;
-            SummonTitoTimer = 47500;
+            SummonTitoTimer = 20000;
 
             SummonedTito = false;
             TitoDied = false;
@@ -311,7 +311,7 @@ public:
 
         void Reset()
         {
-            AggroTimer = 13000;
+            AggroTimer = 5000;
             BrainBashTimer = 5000;
             BrainWipeTimer = 7000;
         }
@@ -428,7 +428,7 @@ public:
 
         void Reset()
         {
-            AggroTimer = 15000;
+            AggroTimer = 5000;
             CleaveTimer = 5000;
             RustTimer   = 30000;
 
@@ -537,7 +537,7 @@ public:
 
         void Reset()
         {
-            AggroTimer = 20000;
+            AggroTimer = 3000;
             MangleTimer = 5000;
             ShredTimer  = 10000;
             ScreamTimer = 15000;
@@ -656,8 +656,8 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             DoScriptText(RAND(SAY_CRONE_AGGRO, SAY_CRONE_AGGRO2), me);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            //me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            //me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
         }
 
         void JustDied(Unit* /*killer*/)
