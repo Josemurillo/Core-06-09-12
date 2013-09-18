@@ -279,6 +279,8 @@ public:
         void EnterEvadeMode()
         {
             me->SetHomePosition(_homePosition);
+			
+			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
             me->SetDisableGravity(true);
 
@@ -305,6 +307,8 @@ public:
                 return;
 
             SetPhase(PHASE_THREE, true);
+			
+			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
             // this despawns Hover Disks
             summons.DespawnAll();
@@ -469,6 +473,8 @@ public:
         void StartPhaseTwo()
         {
             SetPhase(PHASE_TWO, true);
+			
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
             me->SetDisableGravity(true);
             me->SetCanFly(true);
