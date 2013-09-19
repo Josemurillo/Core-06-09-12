@@ -454,7 +454,11 @@ public:
                 if (Creature* memory = Unit::GetCreature(*me, memoryGUID))
                     memory->DespawnOrUnsummon(1000);
             }
-
+			
+			if(me->HasAura(SPELL_SHIELD)){
+				damage = 0;
+			}
+			
             if (!shielded && HealthBelowPct(25))
             {
                 me->InterruptNonMeleeSpells(true);
