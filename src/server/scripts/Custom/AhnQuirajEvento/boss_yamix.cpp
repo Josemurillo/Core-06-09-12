@@ -1,5 +1,6 @@
 /*Boss Yamix*/
 
+#include "ScriptPCH.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 

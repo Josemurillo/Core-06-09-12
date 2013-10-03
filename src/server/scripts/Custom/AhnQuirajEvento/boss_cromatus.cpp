@@ -1,5 +1,6 @@
 /* Cromatus */
 
+#include "ScriptPCH.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
